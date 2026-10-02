@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda de Zapatos</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+        header p {
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background-color: #e2e8f0;
+        }
+        .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0 0 0.5rem 0;
+        }
+        .card-price {
+            font-size: 1.15rem;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .card-desc {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+        }
+        .btn-whatsapp:hover {
+            background-color: #20ba5a;
+        }
+        .empty-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #64748b;
+            padding: 3rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Mi Tienda de Zapatos</h1>
+        <p>Encuentra tu estilo ideal y pídelo al instante por WhatsApp.</p>
+    </header>
+
+    <div class="container">
+        <div class="catalog" id="product-list">
+            <!-- Los productos se cargarán automáticamente -->
+        </div>
+    </div>
+
+    <script>
+        const numeroWhatsApp = "50300000000"; // Cambia por tu número real
+
+        // Aquí se leen los productos guardados
+        let products = JSON.parse(localStorage.getItem('my_shoes_catalog')) || [
+            {
+                name: "Nike Air Running",
+                price: "$65.00",
+                image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+                desc: "Zapatillas deportivas cómodas y ligeras para correr o uso diario."
+            },
+            {
+                name: "Casual Street Classic",
+                price: "$45.00",
+                image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a",
+                desc: "Estilo urbano y versátil combinable con cualquier ropa casual."
+            }
+        ];
+
+        const productList = document.getElementById('product-list');
+
+        function renderProducts() {
+            productList.innerHTML = '';
+            if (products.length === 0) {
+                productList.innerHTML = '<div class="empty-msg">No hay productos disponibles por el momento.</div>';
+                return;
+            }
+
+            products.forEach((product) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const mensajeWa = encodeURIComponent(`Hola, me interesa comprar el modelo: ${product.name} (${product.price})`);
+
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://images.unsplash.com/photo-1560769629-975ec94e6a86'">
+                    <div class="card-body">
+                        <h3 class="card-title">${product.name}</h3>
+                        <div class="card-price">${product.price}</div>
+                        <p class="card-desc">${product.desc}</p>
+                        <a href="https://wa.me/${numeroWhatsApp}?text=${mensajeWa}" class="btn-whatsapp" target="_blank">Pedir por WhatsApp</a>
+                    </div>
+                `;
+                productList.appendChild(card);
+            });
+        }
+
+        renderProducts();
+    </script>
+</body>
+</html>

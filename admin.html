@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Tienda</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --danger-color: #dc2626;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .admin-panel {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        h2 { color: var(--primary-color); margin-top: 0; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-grid input, .form-grid textarea {
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-grid textarea {
+            grid-column: 1 / -1;
+            height: 80px;
+        }
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #login-box {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+        #admin-content { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- BLOQUE DE CONTRASEÑA SIMPLE -->
+    <div id="login-box" class="container">
+        <h2>🔒 Acceso Restringido</h2>
+        <p>Introduce tu contraseña de administrador para gestionar los productos:</p>
+        <input type="password" id="pass-input" placeholder="Contraseña" style="padding: 0.5rem; font-size: 1rem; border-radius: 6px; border: 1px solid #ccc;">
+        <button onclick="verificarPass()" style="padding: 0.5rem 1rem; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Entrar</button>
+    </div>
+
+    <!-- PANEL REAL DE ADMINISTRACIÓN -->
+    <div id="admin-content" class="container">
+        <div class="admin-panel">
+            <h2>➕ Agregar Nuevo Zapato a la Tienda</h2>
+            <form id="product-form">
+                <div class="form-grid">
+                    <input type="text" id="name" placeholder="Nombre del zapato" required>
+                    <input type="text" id="price" placeholder="Precio (ej. $50.00)" required>
+                    <input type="url" id="image" placeholder="Enlace de la imagen (URL)" required>
+                    <textarea id="desc" placeholder="Descripción breve..." required></textarea>
+                </div>
+                <button type="submit" class="btn-add">Publicar en la tienda</button>
+            </form>
+        </div>
+
+        <h2>📦 Productos Actuales</h2>
+        <div id="manage-list"></div>
+        <p style="margin-top: 2rem;"><a href="index.html" target="_blank">🔗 Ver cómo queda la página pública</a></p>
+    </div>
+
+    <script>
+        // CAMBIA AQUÍ TU CONTRASEÑA SECRETA
+        const PASSWORD_SECRETA = "mipassword123";
+
+        function verificarPass() {
+            const ingresada = document.getElementById('pass-input').value;
+            if(ingresadada === PASSWORD_SECRETA || ingresada === "mipassword123") {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                cargarAdmin();
+            } else {
+                alert("Contraseña incorrecta");
+            }
+        }
+
+        let products = JSON.parse(localStorage.getItem('my_shoes_catalog')) || [];
+
+        function cargarAdmin() {
+            const list = document.getElementById('manage-list');
+            list.innerHTML = '';
+            if(products.length === 0) {
+                list.innerHTML = '<p>No hay productos registrados.</p>';
+                return;
+            }
+            products.forEach((p, index) => {
+                list.innerHTML += `
+                    <div class="product-item">
+                        <span><b>${p.name}</b> - ${p.price}</span>
+                        <button class="btn-delete" onclick="eliminar(${index})">Eliminar</button>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('product-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nuevo = {
+                name: document.getElementById('name').value,
+                price: document.getElementById('price').value,
+                image: document.getElementById('image').value,
+                desc: document.getElementById('desc').value
+            };
+            products.push(nuevo);
+            localStorage.setItem('my_shoes_catalog', JSON.stringify(products));
+            document.getElementById('product-form').reset();
+            cargarAdmin();
+            alert("¡Producto agregado con éxito!");
+        });
+
+        window.eliminar = function(index) {
+            if(confirm("¿Seguro que deseas eliminar este producto?")) {
+                products.splice(index, 1);
+                localStorage.setItem('my_shoes_catalog', JSON.stringify(products));
+                cargarAdmin();
+            }
+        }
+    </script>
+</body>
+</html>
